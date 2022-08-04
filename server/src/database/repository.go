@@ -4,6 +4,6 @@ import "server/src/routes/model"
 
 type PasteRepository interface {
 	CreatePaste(p model.PasteCreateRequest) (*model.PasteIdentifier, error)
-	// GetPaste(pId string)
+	GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, error)
 	// DeletePaste()
 }
