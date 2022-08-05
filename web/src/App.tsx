@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import CreatePaste from "./pages/CreatePaste";
 import { PageRoutes } from "./properties/Routes";
 
-export default function App() {
+export default function App(): JSX.Element {
   return (
     <div>
       <BrowserRouter>
