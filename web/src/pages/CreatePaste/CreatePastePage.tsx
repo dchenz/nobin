@@ -1,5 +1,6 @@
 import { Container, Grid, TextareaAutosize } from "@mui/material";
 import React, { useState } from "react";
+import Error from "../../components/Error";
 import NewPassword from "../../components/NewPassword";
 import ExpiryPicker from "./ExpiryPicker";
 import "./styles.scss";
@@ -25,12 +26,14 @@ export default function CreatePastePage(): JSX.Element {
         </Grid>
         <Grid item md={6} p={1} width="100%">
           <h3>Password</h3>
-          <NewPassword
-            password={password}
-            confirmPassword={confirmPassword}
-            onPasswordChange={setPassword}
-            onConfirmPasswordChange={setConfirmPassword}
-          />
+          <Error variant="warning">
+            <NewPassword
+              password={password}
+              confirmPassword={confirmPassword}
+              onPasswordChange={setPassword}
+              onConfirmPasswordChange={setConfirmPassword}
+            />
+          </Error>
         </Grid>
         <Grid item md={6} p={1} width="100%">
           <h3>Expiry</h3>

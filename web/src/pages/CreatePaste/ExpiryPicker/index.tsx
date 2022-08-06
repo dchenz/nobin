@@ -1,7 +1,9 @@
-import { Box, FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import { Box } from "@mui/material";
 import React, { useState } from "react";
+import Error from "../../../components/Error";
 import ExpiryDatePicker from "./ExpiryDatePicker";
 import ExpiryDurationPicker from "./ExpiryDurationPicker";
+import ExpiryModeSelector from "./ExpiryModeSelector";
 
 type ExpiryPickerProps = {
   minutesDuration: number
@@ -11,7 +13,7 @@ type ExpiryPickerProps = {
 export default function ExpiryPicker(props: ExpiryPickerProps): JSX.Element {
   const [mode, setMode] = useState("duration");
   return (
-    <React.Fragment>
+    <Error variant="warning">
       <Box py={1}>
         {
           mode == "duration" ?
@@ -20,23 +22,11 @@ export default function ExpiryPicker(props: ExpiryPickerProps): JSX.Element {
         }
       </Box>
       <Box py={1}>
-        <RadioGroup
-          value={mode}
-          onChange={(e) => setMode(e.target.value)}
-          row
-        >
-          <FormControlLabel
-            control={<Radio />}
-            value="duration"
-            label="Duration"
-          />
-          <FormControlLabel
-            control={<Radio />}
-            value="date"
-            label="Date"
-          />
-        </RadioGroup>
+        <ExpiryModeSelector
+          mode={mode}
+          setMode={setMode}
+        />
       </Box>
-    </React.Fragment>
+    </Error>
   );
 }
