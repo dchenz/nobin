@@ -3,6 +3,9 @@ import { Link } from "react-router-dom";
 import { PageRoutes } from "../../properties/Routes";
 import "./styles.scss";
 
+/**
+ * NavBrand is a logo image that links to the homepage.
+ */
 export default function NavBrand(): JSX.Element {
   return (
     <Link id="nav-brand" to={PageRoutes.home}>

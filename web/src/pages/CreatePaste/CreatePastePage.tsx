@@ -5,6 +5,9 @@ import NewPassword from "../../components/NewPassword";
 import ExpiryPicker from "./ExpiryPicker";
 import "./styles.scss";
 
+/**
+ * CreatePastePage is the main component for creating a new paste.
+ */
 export default function CreatePastePage(): JSX.Element {
   const [pasteContent, setPasteContent] = useState("");
   const [password, setPassword] = useState("");

@@ -9,6 +9,10 @@ type NewPasswordProps = {
   onConfirmPasswordChange: (_: string) => void
 }
 
+/**
+ * NewPassword renders two input fields to create a password.
+ * If the values don't match, it displays a warning.
+ */
 export default function NewPassword(props: NewPasswordProps): JSX.Element {
   const { setError, clearError } = useContext(ErrorContext);
 

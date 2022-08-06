@@ -7,7 +7,11 @@ type ExpiryModeSelectorProps = {
   setMode: (_: string) => void
 }
 
-export default function ExpiryModeSelector(props: ExpiryModeSelectorProps): JSX.Element {
+/**
+ * ExpiryModeSelector renders radio buttons to select an input mode.
+ * The value can be either "duration" (default) or "date".
+ */
+function ExpiryModeSelector(props: ExpiryModeSelectorProps): JSX.Element {
   const { clearError } = useContext(ErrorContext);
   return (
     <RadioGroup
@@ -31,3 +35,5 @@ export default function ExpiryModeSelector(props: ExpiryModeSelectorProps): JSX.
     </RadioGroup>
   );
 }
+
+export default ExpiryModeSelector;

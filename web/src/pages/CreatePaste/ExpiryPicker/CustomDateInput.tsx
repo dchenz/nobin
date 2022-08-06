@@ -6,6 +6,11 @@ type DateInputProps = {
   onClick?: () => void
 }
 
+/**
+ * DateInput is a custom input component used by DatePicker
+ * that activates the date picker on click. It shows the selected
+ * date formatted or "No Expiry", if none is selected.
+ */
 const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
   (props, ref): JSX.Element => (
     <TextField

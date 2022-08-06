@@ -6,7 +6,12 @@ type ExpiryDurationPickerProps = {
   setMinutesDuration: (_: number) => void
 }
 
-export default function ExpiryDurationPicker(props: ExpiryDurationPickerProps): JSX.Element {
+/**
+ * ExpiryDurationPicker contains two input fields. The text field allows
+ * only non-negative integer values. The dropdown is used to select
+ * a unit of time, which can be "minutes", "hours" (default) or "days".
+ */
+function ExpiryDurationPicker(props: ExpiryDurationPickerProps): JSX.Element {
   const [durationUnits, setDurationUnits] = useState("hours");
   const [numericText, setNumericText] = useState("0");
 
@@ -58,3 +63,5 @@ export default function ExpiryDurationPicker(props: ExpiryDurationPickerProps): 
     </FormGroup>
   );
 }
+
+export default ExpiryDurationPicker;

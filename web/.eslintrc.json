@@ -22,16 +22,23 @@
     ],
     "rules": {
         "indent": [
-            "error",
-            2
+            "warn",
+            2,
+            {
+                "SwitchCase": 1
+            }
         ],
         "quotes": [
-            "error",
+            "warn",
             "double"
         ],
         "semi": [
-            "error",
+            "warn",
             "always"
+        ],
+        "max-len": [
+            "warn",
+            100
         ],
         "@typescript-eslint/no-unused-vars": [
             "warn",

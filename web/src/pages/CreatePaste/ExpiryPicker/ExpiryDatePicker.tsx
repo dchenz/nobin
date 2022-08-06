@@ -9,7 +9,13 @@ type ExpiryDatePickerProps = {
   setMinutesDuration: (_: number) => void
 }
 
-export default function ExpiryDatePicker(props: ExpiryDatePickerProps): JSX.Element {
+/**
+ * ExpiryDatePicker allows the user to select a datetime value.
+ * The selected value must be greater than the current time.
+ * All days before today's date are disabled and it will display an error
+ * if the time has already passed. (e.g. Today 12.00am when it's 9.00am).
+ */
+function ExpiryDatePicker(props: ExpiryDatePickerProps): JSX.Element {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   const now = new Date();
@@ -19,7 +25,8 @@ export default function ExpiryDatePicker(props: ExpiryDatePickerProps): JSX.Elem
     setSelectedDate(date);
     if (date) {
       const expiryTime = date.getTime();
-      const minutesUntilExpire = Math.floor((expiryTime - now.getTime()) / 60000);
+      const millisecondsDiff = expiryTime - now.getTime();
+      const minutesUntilExpire = Math.floor(millisecondsDiff / 60000);
       props.setMinutesDuration(minutesUntilExpire);
     }
   };
@@ -43,4 +50,6 @@ export default function ExpiryDatePicker(props: ExpiryDatePickerProps): JSX.Elem
     />
   );
 }
+
+export default ExpiryDatePicker;
 
