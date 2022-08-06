@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { PageRoutes } from "../../properties/Routes";
+import { PageRoutes } from "../../shared/Routes";
 import "./styles.scss";
 
 /**

@@ -1,7 +1,8 @@
-import { Container, Grid, TextareaAutosize } from "@mui/material";
+import { Button, Container, Grid, TextareaAutosize } from "@mui/material";
 import React, { useState } from "react";
 import Error from "../../components/Error";
 import NewPassword from "../../components/NewPassword";
+import { encrypt } from "../../functions/Crypto";
 import ExpiryPicker from "./ExpiryPicker";
 import "./styles.scss";
 
@@ -13,6 +14,11 @@ export default function CreatePastePage(): JSX.Element {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [expiryDuration, setExpiryDuration] = useState(0); // Minutes
+
+  const onPasteSubmit = () => {
+    const encryptedPaste = encrypt(pasteContent, password);
+    console.log(encryptedPaste);
+  };
 
   return (
     <Container>
@@ -44,6 +50,14 @@ export default function CreatePastePage(): JSX.Element {
             minutesDuration={expiryDuration}
             setMinutesDuration={setExpiryDuration}
           />
+        </Grid>
+        <Grid item md={12} p={1} width="100%">
+          <Button
+            variant="contained"
+            onClick={onPasteSubmit}
+          >
+            Submit
+          </Button>
         </Grid>
       </Grid>
     </Container>
