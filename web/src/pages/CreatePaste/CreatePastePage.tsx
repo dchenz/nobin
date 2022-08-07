@@ -1,7 +1,9 @@
 import { Button, Container, Grid, TextareaAutosize } from "@mui/material";
 import React, { useMemo, useState } from "react";
+import { submitPaste } from "../../api/SubmitPaste";
 import Error from "../../components/Error";
 import { encrypt } from "../../functions/Crypto";
+import { PasteSubmitResponse } from "../../shared/types/Paste";
 import ExpiryPicker from "./ExpiryPicker";
 import NewPassword from "./NewPassword";
 import "./styles.scss";
@@ -36,7 +38,12 @@ export default function CreatePastePage(): JSX.Element {
   const onPasteSubmit = () => {
     if (canSubmit) {
       const encryptedPaste = encrypt(pasteContent, password);
-      console.log(encryptedPaste);
+      submitPaste(encryptedPaste, {
+        duration: duration,
+        editable: false
+      })
+        .then((response: PasteSubmitResponse) => console.log(response))
+        .catch(console.error);
     }
   };
 
