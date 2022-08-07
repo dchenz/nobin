@@ -1,15 +1,17 @@
+import { AlertColor } from "@mui/material";
 import { createContext } from "react";
 
-export type ErrorMessage = string | null
+export type ErrorMessage = {
+  message: string
+  severity: AlertColor
+}
 
 export type ErrorContextType = {
-  error: ErrorMessage
-  setError: (_: ErrorMessage) => void
-  clearError: () => void
+  error: ErrorMessage | null
+  setError: (_: ErrorMessage | null) => void
 }
 
 export default createContext<ErrorContextType>({
   error: null,
-  setError: (_: ErrorMessage) => { return; },
-  clearError: () => { return; }
+  setError: (_: ErrorMessage | null) => { return; }
 });

@@ -1,9 +1,9 @@
 import { Button, Container, Grid, TextareaAutosize } from "@mui/material";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Error from "../../components/Error";
-import NewPassword from "../../components/NewPassword";
 import { encrypt } from "../../functions/Crypto";
 import ExpiryPicker from "./ExpiryPicker";
+import NewPassword from "./NewPassword";
 import "./styles.scss";
 
 /**
@@ -13,11 +13,31 @@ export default function CreatePastePage(): JSX.Element {
   const [pasteContent, setPasteContent] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [expiryDuration, setExpiryDuration] = useState(0); // Minutes
+  const [duration, setDuration] = useState(0); // Minutes
+
+  const canSubmit = useMemo(() => {
+    // Fail submission if password is left blank.
+    // Fail submission if passwords don't match.
+    if (password == "" || password != confirmPassword) {
+      return false;
+    }
+    // Fail submission if duration is non-zero and less than 5 minutes.
+    // Fail submission if duration is greater than one year.
+    if ((duration > 0 && duration < 5) || duration > 365 * 24 * 60) {
+      return false;
+    }
+    // Fail submission if paste is blank.
+    if (pasteContent == "") {
+      return false;
+    }
+    return true;
+  }, [password, confirmPassword, duration, pasteContent]);
 
   const onPasteSubmit = () => {
-    const encryptedPaste = encrypt(pasteContent, password);
-    console.log(encryptedPaste);
+    if (canSubmit) {
+      const encryptedPaste = encrypt(pasteContent, password);
+      console.log(encryptedPaste);
+    }
   };
 
   return (
@@ -35,7 +55,7 @@ export default function CreatePastePage(): JSX.Element {
         </Grid>
         <Grid item md={6} p={1} width="100%">
           <h3>Password</h3>
-          <Error variant="warning">
+          <Error>
             <NewPassword
               password={password}
               confirmPassword={confirmPassword}
@@ -46,15 +66,18 @@ export default function CreatePastePage(): JSX.Element {
         </Grid>
         <Grid item md={6} p={1} width="100%">
           <h3>Expiry</h3>
-          <ExpiryPicker
-            minutesDuration={expiryDuration}
-            setMinutesDuration={setExpiryDuration}
-          />
+          <Error>
+            <ExpiryPicker
+              minutesDuration={duration}
+              setMinutesDuration={setDuration}
+            />
+          </Error>
         </Grid>
         <Grid item md={12} p={1} width="100%">
           <Button
             variant="contained"
             onClick={onPasteSubmit}
+            disabled={!canSubmit}
           >
             Submit
           </Button>
@@ -63,3 +86,4 @@ export default function CreatePastePage(): JSX.Element {
     </Container>
   );
 }
+

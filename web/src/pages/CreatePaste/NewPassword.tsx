@@ -1,6 +1,7 @@
 import { Box, FormGroup, TextField } from "@mui/material";
 import React, { useContext } from "react";
-import ErrorContext from "./Error/Context";
+import ErrorContext from "../../components/Error/Context";
+import { MISMATCH_PASSWORDS } from "./Validation";
 
 type NewPasswordProps = {
   password: string
@@ -14,13 +15,13 @@ type NewPasswordProps = {
  * If the values don't match, it displays a warning.
  */
 export default function NewPassword(props: NewPasswordProps): JSX.Element {
-  const { setError, clearError } = useContext(ErrorContext);
+  const { setError } = useContext(ErrorContext);
 
   // Test for password mismatch when both fields are non-empty.
   const onInputBlur = () => {
     if (props.password && props.confirmPassword) {
       if (props.password != props.confirmPassword) {
-        setError("Passwords don't match...");
+        setError(MISMATCH_PASSWORDS);
       }
     }
   };
@@ -34,7 +35,7 @@ export default function NewPassword(props: NewPasswordProps): JSX.Element {
           value={props.password}
           onChange={(e) => {
             props.onPasswordChange(e.target.value);
-            clearError();
+            setError(null);
           }}
           onBlur={onInputBlur}
           fullWidth
@@ -47,7 +48,7 @@ export default function NewPassword(props: NewPasswordProps): JSX.Element {
           value={props.confirmPassword}
           onChange={(e) => {
             props.onConfirmPasswordChange(e.target.value);
-            clearError();
+            setError(null);
           }}
           onBlur={onInputBlur}
           fullWidth

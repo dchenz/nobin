@@ -1,9 +1,9 @@
-import { Alert, AlertColor, Box } from "@mui/material";
+import { Alert, Box } from "@mui/material";
 import React, { useState } from "react";
 import ErrorContext, { ErrorMessage } from "./Context";
 
 type ErrorProps = {
-  variant: AlertColor
+  overrideError?: ErrorMessage
   children: React.ReactNode
 }
 
@@ -13,16 +13,16 @@ type ErrorProps = {
  * to trigger/hide an alert that displays below them.
  */
 export default function Error(props: ErrorProps): JSX.Element {
-  const [error, setError] = useState<ErrorMessage>(null);
-  const clearError = () => setError(null);
+  const [error, setError] = useState<ErrorMessage | null>(null);
+  const displayedError = props.overrideError ?? error;
   return (
-    <ErrorContext.Provider value={{ error, setError, clearError }}>
+    <ErrorContext.Provider value={{ error, setError }}>
       {props.children}
       <Box py={1}>
         {
-          error ?
-            <Alert severity={props.variant}>
-              {error}
+          displayedError ?
+            <Alert severity={displayedError.severity}>
+              {displayedError.message}
             </Alert> : null
         }
       </Box>
