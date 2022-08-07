@@ -31,8 +31,11 @@ export function encrypt(text: string, password: string, ops?: HMACOptions): Past
   const salt = CryptoJS.lib.WordArray.random(SALT_SIZE);
   // Derive the key for AES-256 by hashing password and salt.
   const key = deriveKey(ops.hash, password, salt, ops.iters);
+  // Convert the plaintext to JSON so it's possible to verify
+  // a successful decryption by JSON-decoding the returned plaintext.
+  const plainText = JSON.stringify({ data: text });
   // Encrypt the plaintext using AES-CBC mode.
-  const encrypted = CryptoJS.AES.encrypt(text, key, {
+  const encrypted = CryptoJS.AES.encrypt(plainText, key, {
     mode: CryptoJS.mode.CBC,
     iv: iv
   });
@@ -57,13 +60,13 @@ export function encrypt(text: string, password: string, ops?: HMACOptions): Past
  *
  * @returns        Plain-text content as UTF-8.
  */
-export function decrypt(paste: Paste, password: string): string {
+export function decrypt(paste: Paste, password: string): string | null {
   const { header, body } = paste;
   // Derive the key for AES-256 by hashing password and salt.
   const iv = CryptoJS.enc.Base64.parse(header.iv);
   const salt = CryptoJS.enc.Base64.parse(header.salt);
   const key = deriveKey(header.options.hash, password, salt, header.options.iters);
-  // Decrypt the AES-encrypted cipher-text.
+  // Decrypt the AES-encrypted cipher-text into UTF-8.
   const cipherText = CryptoJS.lib.CipherParams.create({
     ciphertext: CryptoJS.enc.Base64.parse(body)
   });
@@ -71,8 +74,13 @@ export function decrypt(paste: Paste, password: string): string {
     mode: CryptoJS.mode.CBC,
     iv: iv
   });
-  // Decode decrypted text into UTF-8.
-  return decrypted.toString(CryptoJS.enc.Utf8);
+  // Attempt to decode JSON and return the plaintext.
+  try {
+    const plainText = decrypted.toString(CryptoJS.enc.Utf8);
+    return JSON.parse(plainText)?.data ?? null;
+  } catch (e) {
+    return null;
+  }
 }
 
 /**
