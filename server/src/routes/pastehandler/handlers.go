@@ -8,7 +8,7 @@ import (
 )
 
 func Register(s *server.Runtime) {
-	r := s.Router.PathPrefix("/paste").Subrouter()
+	r := s.Router.PathPrefix("/api/paste").Subrouter()
 	r.Handle("/{id}", handleReadPaste(s)).Methods("GET")
 	r.Handle("", handleCreatePaste(s)).Methods("POST")
 	r.Handle("/{id}", handleUpdatePaste(s)).Methods("POST")

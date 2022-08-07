@@ -17,7 +17,7 @@ export async function submitPaste(paste: Paste, ops: PasteOptions): Promise<Past
     duration: ops.duration,
     editable: ops.editable
   };
-  const response = await fetch("/paste", {
+  const response = await fetch("/api/paste", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
