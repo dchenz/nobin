@@ -15,5 +15,4 @@ sqlite:
 
 test:
 	@python3 scripts/createdb_sqlite.py ${GO_SQLITE_TEST_PATH} --replace
-	@export GO_SQLITE_TEST_PATH=${GO_SQLITE_TEST_PATH}
-	@go test ./...
+	@export GO_SQLITE_TEST_PATH=${GO_SQLITE_TEST_PATH} && go test ./...
