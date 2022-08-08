@@ -15,7 +15,7 @@ export async function getPaste(id: string): Promise<PasteFull | null> {
   }
   return {
     id: data.id,
-    createdAt: data.created_at,
+    createdAt: new Date(data.created_at * 1000),
     content: {
       header: JSON.parse(data.header),
       body: data.body

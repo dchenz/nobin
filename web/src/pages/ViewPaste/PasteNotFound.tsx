@@ -7,7 +7,7 @@ import React from "react";
 export default function PasteNotFound(): JSX.Element {
   return (
     <Container>
-      <Grid container>
+      <Grid container py={3}>
         <Grid item md={12} p={1} width="100%" textAlign="center">
           <h1>Paste not found</h1>
           <Box py={1}>

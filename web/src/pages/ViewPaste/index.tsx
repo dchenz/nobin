@@ -4,6 +4,7 @@ import { getPaste } from "../../api/GetPaste";
 import { PasteFull } from "../../shared/types/Paste";
 import PasteNotFound from "./PasteNotFound";
 import UnlockPage from "./UnlockPage";
+import ViewPastePage from "./ViewPastePage";
 
 /**
  * ViewPaste is the page for reading a paste (requires decryption).
@@ -12,6 +13,7 @@ import UnlockPage from "./UnlockPage";
 export default function ViewPaste(): JSX.Element {
   const [paste, setPaste] = useState<PasteFull | null>(null);
   const [isLoading, setLoading] = useState(true);
+  const [isUnlocked, setUnlocked] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -38,5 +40,19 @@ export default function ViewPaste(): JSX.Element {
     return <PasteNotFound />;
   }
 
-  return <UnlockPage paste={paste} />;
+  if (isUnlocked) {
+    return <ViewPastePage paste={paste} />;
+  }
+
+  const onDecrypt = (decrypted: PasteFull) => {
+    setPaste(decrypted);
+    setUnlocked(true);
+  };
+
+  return (
+    <UnlockPage
+      paste={paste}
+      onDecrypt={onDecrypt}
+    />
+  );
 }

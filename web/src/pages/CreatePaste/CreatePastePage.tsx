@@ -9,7 +9,6 @@ import { PasteRef } from "../../shared/types/Paste";
 import { Maybe } from "../../shared/types/Responses";
 import ExpiryPicker from "./ExpiryPicker";
 import NewPassword from "./NewPassword";
-import "./styles.scss";
 
 /**
  * CreatePastePage is the main component for creating a new paste.

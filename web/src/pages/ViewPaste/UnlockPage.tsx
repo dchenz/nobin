@@ -7,6 +7,7 @@ import { PasteFull } from "../../shared/types/Paste";
 
 type UnlockPageProps = {
   paste: PasteFull
+  onDecrypt: (_: PasteFull) => void
 }
 
 /**
@@ -15,7 +16,7 @@ type UnlockPageProps = {
 export default function UnlockPage(props: UnlockPageProps): JSX.Element {
   return (
     <Container>
-      <Grid container>
+      <Grid container py={3}>
         <Grid item md={12} p={1} width="100%" textAlign="center">
           <h1>Unlock this paste</h1>
           <Box width="50%" margin="0 auto">
@@ -33,24 +34,32 @@ export default function UnlockPage(props: UnlockPageProps): JSX.Element {
  * UnlockPasswordPrompt displays the password input field and
  * includes an appropriate error if the entered password is incorrect.
  */
-function UnlockPasswordPrompt(props: UnlockPageProps): JSX.Element {
+function UnlockPasswordPrompt({ paste, onDecrypt }: UnlockPageProps): JSX.Element {
   const { setError } = useContext(ErrorContext);
   const [password, setPassword] = useState("");
 
   const onPasswordSubmit = () => {
-    const decryptedPaste = decrypt(props.paste.content, password);
-    if (!decryptedPaste) {
+    if (password == "") {
+      return;
+    }
+    const plainTextPaste = decrypt(paste.content, password);
+    if (plainTextPaste) {
+      const p = { ...paste, content: { ...paste.content } };
+      p.content.body = plainTextPaste;
+      onDecrypt(p);
+    } else {
       setError({
         message: "Incorrect password.",
         severity: "error"
       });
-      return;
     }
-    console.log(decryptedPaste);
   };
 
   return (
-    <React.Fragment>
+    <form onSubmit={(e) => {
+      e.preventDefault();
+      onPasswordSubmit();
+    }}>
       <Box py={1}>
         <TextField
           type="password"
@@ -66,11 +75,12 @@ function UnlockPasswordPrompt(props: UnlockPageProps): JSX.Element {
       <Box py={1}>
         <Button
           variant="contained"
-          onClick={onPasswordSubmit}
+          type="submit"
+          disabled={password == ""}
         >
           Submit
         </Button>
       </Box>
-    </React.Fragment>
+    </form>
   );
 }
