@@ -1,9 +1,12 @@
 import { Button, Container, Grid, TextareaAutosize } from "@mui/material";
 import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { submitPaste } from "../../api/SubmitPaste";
 import Error from "../../components/Error";
 import { encrypt } from "../../functions/Crypto";
-import { PasteSubmitResponse } from "../../shared/types/Paste";
+import { PageRoutes } from "../../shared/Routes";
+import { PasteRef } from "../../shared/types/Paste";
+import { Maybe } from "../../shared/types/Responses";
 import ExpiryPicker from "./ExpiryPicker";
 import NewPassword from "./NewPassword";
 import "./styles.scss";
@@ -16,6 +19,7 @@ export default function CreatePastePage(): JSX.Element {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [duration, setDuration] = useState(0); // Minutes
+  const navigate = useNavigate();
 
   const canSubmit = useMemo(() => {
     // Fail submission if password is left blank.
@@ -38,11 +42,24 @@ export default function CreatePastePage(): JSX.Element {
   const onPasteSubmit = () => {
     if (canSubmit) {
       const encryptedPaste = encrypt(pasteContent, password);
-      submitPaste(encryptedPaste, {
+      const paste = {
+        content: encryptedPaste,
         duration: duration,
-        editable: false
-      })
-        .then((response: PasteSubmitResponse) => console.log(response))
+        editable: false // TODO: Add toggle for edit setting.
+      };
+      submitPaste(paste)
+        .then(({ success, data }: Maybe<PasteRef>) => {
+          if (success) {
+            // Redirect the user to the newly-created paste.
+            let newURL = `${PageRoutes.viewPasteRoot}/${data.id}`;
+            if (data.editKey) {
+              newURL += `?edit_key=${encodeURIComponent(data.editKey)}`;
+            }
+            navigate(newURL);
+          } else {
+            console.error(data);
+          }
+        })
         .catch(console.error);
     }
   };

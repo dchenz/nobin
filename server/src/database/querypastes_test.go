@@ -15,74 +15,78 @@ func TestCreateGetPaste(t *testing.T) {
 
 	// CASE: Editable paste, has expiry.
 	request := model.PasteCreateRequest{
-		Headers:          "test",
-		EncryptedContent: "hello world",
-		Editable:         true,
-		MinutesDuration:  100,
+		Header:   "test",
+		Body:     "hello world",
+		Editable: true,
+		Duration: 100,
 	}
-	// Create the paste.
-	result, err := d.CreatePaste(request)
-	assert.Nil(t, err)
-	assert.Equal(t, len(result.Id), 32)
-	assert.Equal(t, len(result.EditKey), 32)
 
-	// Get paste again.
-	retrieved, err := d.getPaste(result.Id)
-	assert.Nil(t, err)
-	assert.Equal(t, result.Id, retrieved.Id)
-	assert.Equal(t, result.EditKey, retrieved.EditKey)
-	// Should be editable.
-	assert.True(t, retrieved.Editable)
-	assert.Greater(t, time.Now(), retrieved.CreatedAt)
-	// Expiry should be set to 100 minutes more than creation time.
-	expectedExpiry := retrieved.CreatedAt.Add(time.Minute * time.Duration(request.MinutesDuration))
-	assert.Equal(t, expectedExpiry, retrieved.Expiry.Time)
-	assert.Equal(t, request.Headers, retrieved.Headers)
-	assert.Equal(t, request.EncryptedContent, retrieved.ContentBody)
+	ref, err := d.CreatePaste(request)
+	if err != nil {
+		assert.FailNow(t, "unexpected error: "+err.Error())
+	}
+	assert.Equal(t, len(ref.Id), 32)
+	assert.Equal(t, len(ref.EditKey), 32)
+
+	paste, err := d.GetPaste(*ref)
+	if err != nil {
+		assert.FailNow(t, "unexpected error: "+err.Error())
+	}
+	assert.Equal(t, ref.Id, paste.Id)
+	assert.Equal(t, request.Editable, paste.Editable)
+	assert.GreaterOrEqual(t, time.Now().Unix(), paste.CreatedAt)
+	assert.Equal(t, request.Duration, paste.Duration)
+	assert.Equal(t, request.Header, paste.Header)
+	assert.Equal(t, request.Body, paste.Body)
+	assert.True(t, paste.Editable)
 
 	// CASE: Non-editable paste, no expiry.
 	request = model.PasteCreateRequest{
-		Headers:          "test",
-		EncryptedContent: "hello world",
-		Editable:         false,
-		MinutesDuration:  0,
+		Header:   "test",
+		Body:     "hello world",
+		Editable: false,
+		Duration: 0,
 	}
-	// Create the paste.
-	result, err = d.CreatePaste(request)
-	assert.Nil(t, err)
-	assert.Equal(t, len(result.Id), 32)
-	assert.Equal(t, result.EditKey, "")
 
-	// Get paste again.
-	retrieved, err = d.getPaste(result.Id)
-	assert.Nil(t, err)
-	assert.Equal(t, result.Id, retrieved.Id)
-	assert.Equal(t, result.EditKey, retrieved.EditKey)
-	// Should not be editable.
-	assert.False(t, retrieved.Editable)
-	assert.Greater(t, time.Now(), retrieved.CreatedAt)
-	// Expiry should be NULL since MinutesDuration is 0.
-	assert.False(t, retrieved.Expiry.Valid)
-	assert.Equal(t, request.Headers, retrieved.Headers)
-	assert.Equal(t, request.EncryptedContent, retrieved.ContentBody)
+	ref, err = d.CreatePaste(request)
+	if err != nil {
+		assert.FailNow(t, "unexpected error: "+err.Error())
+	}
+	assert.Equal(t, len(ref.Id), 32)
+	assert.Equal(t, len(ref.EditKey), 0)
+
+	paste, err = d.GetPaste(*ref)
+	if err != nil {
+		assert.FailNow(t, "unexpected error: "+err.Error())
+	}
+	assert.Equal(t, ref.Id, paste.Id)
+	assert.Equal(t, request.Editable, paste.Editable)
+	assert.GreaterOrEqual(t, time.Now().Unix(), paste.CreatedAt)
+	assert.Equal(t, request.Duration, paste.Duration)
+	assert.Equal(t, request.Header, paste.Header)
+	assert.Equal(t, request.Body, paste.Body)
+	assert.False(t, paste.Editable)
 
 	// CASE: Expired paste.
-	longTimeAgo := time.Now().Add(time.Hour * time.Duration(-4))
+	longTimeAgo := addMinutesToDate(time.Now(), -60)
 	err = d.createPaste(dbmodel.Paste{
-		Id:        "abc",
-		EditKey:   "hello",
-		Editable:  true,
+		Id: "abc",
+		EditKey: sql.NullString{
+			Valid: false,
+		},
 		CreatedAt: longTimeAgo,
 		Expiry: sql.NullTime{
 			Time:  longTimeAgo,
 			Valid: true,
 		},
-		Headers:     "test",
-		ContentBody: "hello world",
+		Header: "test",
+		Body:   "hello world",
 	})
-	assert.Nil(t, err)
+	if err != nil {
+		assert.FailNow(t, "unexpected error: "+err.Error())
+	}
 	// Expect no rows returned.
-	retrieved, err = d.getPaste("abc")
-	assert.Nil(t, retrieved)
+	p, err := d.getPaste("abc")
+	assert.Nil(t, p)
 	assert.Error(t, err, sql.ErrNoRows)
 }

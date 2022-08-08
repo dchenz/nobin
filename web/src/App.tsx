@@ -3,19 +3,21 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import CreatePaste from "./pages/CreatePaste";
+import ViewPaste from "./pages/ViewPaste";
 import { PageRoutes } from "./shared/Routes";
 
 export default function App(): JSX.Element {
   return (
-    <div>
-      <BrowserRouter>
-        <Navbar />
+    <BrowserRouter>
+      <Navbar />
+      <div id="app-body">
         <Routes>
           <Route path={PageRoutes.home} element={<CreatePaste />} />
+          <Route path={PageRoutes.viewPaste} element={<ViewPaste />} />
         </Routes>
-        <Footer />
-      </BrowserRouter>
-    </div>
+      </div>
+      <Footer />
+    </BrowserRouter>
   );
 }
 

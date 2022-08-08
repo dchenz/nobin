@@ -4,64 +4,59 @@ import (
 	"database/sql"
 	dbmodel "server/src/database/model"
 	"server/src/routes/model"
-	"strings"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 func (d *PastesDB) GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, error) {
-	pasteEntity, err := d.getPaste(ref.Id)
+	p, err := d.getPaste(ref.Id)
 	if err != nil {
 		return nil, err
 	}
-	// Not editable if the provided edit key does not match.
-	if pasteEntity.Editable && pasteEntity.EditKey != ref.EditKey {
-		pasteEntity.Editable = false
+	var pasteDuration int
+	if p.Expiry.Valid {
+		pasteDuration = minutesBetweenDates(p.Expiry.Time, p.CreatedAt)
 	}
-	var expiryTime *int64
-	if pasteEntity.Expiry.Valid {
-		t := pasteEntity.Expiry.Time.Unix()
-		expiryTime = &t
-	}
+	// Not editable if paste has no edit key or if keys don't match.
+	canEdit := p.EditKey.Valid && p.EditKey.String == ref.EditKey
 	paste := model.PasteResponse{
-		Id:          pasteEntity.Id,
-		Editable:    pasteEntity.Editable,
-		CreatedAt:   pasteEntity.CreatedAt.Unix(),
-		Expiry:      expiryTime,
-		Headers:     pasteEntity.Headers,
-		ContentBody: pasteEntity.ContentBody,
+		Id:        p.Id,
+		Editable:  canEdit,
+		CreatedAt: p.CreatedAt.Unix(),
+		Duration:  pasteDuration,
+		Header:    p.Header,
+		Body:      p.Body,
 	}
 	return &paste, nil
 }
 
-func (d *PastesDB) CreatePaste(p model.PasteCreateRequest) (*model.PasteIdentifier, error) {
-	pasteId := strings.ReplaceAll(uuid.NewString(), "-", "")
-	editKey := ""
-	if p.Editable {
-		editKey = strings.ReplaceAll(uuid.NewString(), "-", "")
+func (d *PastesDB) CreatePaste(paste model.PasteCreateRequest) (*model.PasteIdentifier, error) {
+	pasteID := createUUID()
+	editKey := sql.NullString{
+		Valid: false,
 	}
-	createdAt := time.Now()
+	if paste.Editable {
+		editKey.String = createUUID()
+		editKey.Valid = true
+	}
+	now := time.Now()
 	expiry := sql.NullTime{
-		Time:  createdAt.Add(time.Duration(time.Minute * time.Duration(p.MinutesDuration))),
-		Valid: p.MinutesDuration > 0,
+		Time:  addMinutesToDate(now, paste.Duration),
+		Valid: paste.Duration > 0,
 	}
-	pasteEntity := dbmodel.Paste{
-		Id:          pasteId,
-		EditKey:     editKey,
-		Editable:    p.Editable,
-		CreatedAt:   createdAt,
-		Expiry:      expiry,
-		Headers:     p.Headers,
-		ContentBody: p.EncryptedContent,
+	p := dbmodel.Paste{
+		Id:        pasteID,
+		EditKey:   editKey,
+		CreatedAt: now,
+		Expiry:    expiry,
+		Header:    paste.Header,
+		Body:      paste.Body,
 	}
-	err := d.createPaste(pasteEntity)
-	if err != nil {
+	if err := d.createPaste(p); err != nil {
 		return nil, err
 	}
 	m := model.PasteIdentifier{
-		Id:      pasteId,
-		EditKey: editKey,
+		Id:      pasteID,
+		EditKey: editKey.String,
 	}
 	return &m, nil
 }

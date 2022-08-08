@@ -6,11 +6,10 @@ import (
 )
 
 type Paste struct {
-	Id          string
-	EditKey     string
-	Editable    bool
-	CreatedAt   time.Time
-	Expiry      sql.NullTime
-	Headers     string
-	ContentBody string
+	Id        string
+	EditKey   sql.NullString
+	CreatedAt time.Time
+	Expiry    sql.NullTime
+	Header    string
+	Body      string
 }

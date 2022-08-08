@@ -10,19 +10,19 @@ import (
 )
 
 type PasteResponse struct {
-	Id          string `json:"id"`
-	Editable    bool   `json:"editable"`
-	CreatedAt   int64  `json:"created_at"`
-	Expiry      *int64 `json:"expiry"`
-	Headers     string `json:"headers"`
-	ContentBody string `json:"content"`
+	Id        string `json:"id"`
+	Editable  bool   `json:"editable"`
+	CreatedAt int64  `json:"created_at"`
+	Duration  int    `json:"duration"`
+	Header    string `json:"header"`
+	Body      string `json:"body"`
 }
 
 type PasteCreateRequest struct {
-	Headers          string `json:"headers"`
-	EncryptedContent string `json:"content"`
-	MinutesDuration  int64  `json:"duration"`
-	Editable         bool   `json:"editable"`
+	Header   string `json:"header"`
+	Body     string `json:"body"`
+	Duration int    `json:"duration"`
+	Editable bool   `json:"editable"`
 }
 
 func (m *PasteCreateRequest) Parse(r *http.Request) error {
@@ -38,14 +38,14 @@ func (m *PasteCreateRequest) Parse(r *http.Request) error {
 }
 
 func (m *PasteCreateRequest) Validate() error {
-	if m.Headers == "" {
-		return fmt.Errorf("missing/invalid value for attribute 'headers'")
+	if m.Header == "" {
+		return fmt.Errorf("missing paste header")
 	}
-	if m.EncryptedContent == "" {
-		return fmt.Errorf("missing/invalid value for attribute 'content'")
+	if m.Body == "" {
+		return fmt.Errorf("missing paste body")
 	}
-	if m.MinutesDuration < 0 {
-		return fmt.Errorf("missing/invalid value for attribute 'duration'")
+	if m.Duration != 0 && !(m.Duration >= 5 && m.Duration <= 60*24*365) {
+		return fmt.Errorf("duration must be in range [5, 525600]")
 	}
 	return nil
 }
@@ -70,7 +70,7 @@ func (m *PasteIdentifier) Parse(r *http.Request) error {
 
 func (m *PasteIdentifier) Validate() error {
 	if m.Id == "" {
-		return fmt.Errorf("missing/invalid value for path variable 'id'")
+		return fmt.Errorf("missing paste ID")
 	}
 	return nil
 }

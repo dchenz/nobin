@@ -17,8 +17,8 @@ test("Encrypt/decrypt - AES256/SHA256", () => {
   expect(encryptionOutput.body).not.toBe(Buffer.from(text).toString("base64"));
 
   // Options should be copied into the returned header.
-  expect(encryptionOutput.header.options.hash).toBe(ops.hash);
-  expect(encryptionOutput.header.options.iters).toBe(ops.iters);
+  expect(encryptionOutput.header.hash).toBe(ops.hash);
+  expect(encryptionOutput.header.iters).toBe(ops.iters);
 
   // 16-bytes encoded as Base64 should be 24 characters long.
   expect(encryptionOutput.header.iv.length).toBe(BASE64_16_BYTES_SIZE);
@@ -47,8 +47,8 @@ test("Encrypt/decrypt - AES256/SHA512", () => {
   expect(encryptionOutput.body).not.toBe(Buffer.from(text).toString("base64"));
 
   // Options should be copied into the returned header.
-  expect(encryptionOutput.header.options.hash).toBe(ops.hash);
-  expect(encryptionOutput.header.options.iters).toBe(ops.iters);
+  expect(encryptionOutput.header.hash).toBe(ops.hash);
+  expect(encryptionOutput.header.iters).toBe(ops.iters);
 
   // 16-bytes encoded as Base64 should be 24 characters long.
   expect(encryptionOutput.header.iv.length).toBe(BASE64_16_BYTES_SIZE);
@@ -77,8 +77,8 @@ test("Encrypt/decrypt - empty plaintext", () => {
   expect(encryptionOutput.body).not.toBe(Buffer.from(text).toString("base64"));
 
   // Options should be copied into the returned header.
-  expect(encryptionOutput.header.options.hash).toBe(ops.hash);
-  expect(encryptionOutput.header.options.iters).toBe(ops.iters);
+  expect(encryptionOutput.header.hash).toBe(ops.hash);
+  expect(encryptionOutput.header.iters).toBe(ops.iters);
 
   // 16-bytes encoded as Base64 should be 24 characters long.
   expect(encryptionOutput.header.iv.length).toBe(BASE64_16_BYTES_SIZE);
@@ -107,8 +107,8 @@ test("Encrypt/decrypt - unicode characters", () => {
   expect(encryptionOutput.body).not.toBe(Buffer.from(text).toString("base64"));
 
   // Options should be copied into the returned header.
-  expect(encryptionOutput.header.options.hash).toBe(ops.hash);
-  expect(encryptionOutput.header.options.iters).toBe(ops.iters);
+  expect(encryptionOutput.header.hash).toBe(ops.hash);
+  expect(encryptionOutput.header.iters).toBe(ops.iters);
 
   // 16-bytes encoded as Base64 should be 24 characters long.
   expect(encryptionOutput.header.iv.length).toBe(BASE64_16_BYTES_SIZE);

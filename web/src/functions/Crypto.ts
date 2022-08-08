@@ -1,5 +1,5 @@
 import CryptoJS from "crypto-js";
-import { HMACOptions, Paste } from "../shared/types/Paste";
+import { HMACOptions, PasteContent } from "../shared/types/Paste";
 
 type Bytes = CryptoJS.lib.WordArray
 
@@ -20,7 +20,7 @@ const SALT_SIZE = 16;
  *
  * @returns        Paste object with header and encrypted body (Base64).
  */
-export function encrypt(text: string, password: string, ops?: HMACOptions): Paste {
+export function encrypt(text: string, password: string, ops?: HMACOptions): PasteContent {
   // Use default PBKDF2 options if not provided.
   if (!ops) {
     ops = defaultOptions;
@@ -46,7 +46,7 @@ export function encrypt(text: string, password: string, ops?: HMACOptions): Past
     header: {
       iv: iv.toString(CryptoJS.enc.Base64),
       salt: salt.toString(CryptoJS.enc.Base64),
-      options: ops
+      ...ops
     },
     body: encrypted.ciphertext.toString(CryptoJS.enc.Base64)
   };
@@ -60,12 +60,12 @@ export function encrypt(text: string, password: string, ops?: HMACOptions): Past
  *
  * @returns        Plain-text content as UTF-8.
  */
-export function decrypt(paste: Paste, password: string): string | null {
+export function decrypt(paste: PasteContent, password: string): string | null {
   const { header, body } = paste;
   // Derive the key for AES-256 by hashing password and salt.
   const iv = CryptoJS.enc.Base64.parse(header.iv);
   const salt = CryptoJS.enc.Base64.parse(header.salt);
-  const key = deriveKey(header.options.hash, password, salt, header.options.iters);
+  const key = deriveKey(header.hash, password, salt, header.iters);
   // Decrypt the AES-encrypted cipher-text into UTF-8.
   const cipherText = CryptoJS.lib.CipherParams.create({
     ciphertext: CryptoJS.enc.Base64.parse(body)

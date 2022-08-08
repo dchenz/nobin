@@ -9,49 +9,57 @@ import (
 func TestPasteCreateRequest(t *testing.T) {
 	// Good case.
 	m := PasteCreateRequest{
-		Headers:          "test",
-		EncryptedContent: "hello world",
-		Editable:         false,
-		MinutesDuration:  0,
+		Header:   "test",
+		Body:     "hello world",
+		Editable: false,
+		Duration: 0,
 	}
 	assert.Nil(t, m.Validate())
 	// Bad case: Negative duration is invalid.
 	m = PasteCreateRequest{
-		Headers:          "test",
-		EncryptedContent: "hello world",
-		Editable:         false,
-		MinutesDuration:  -1,
+		Header:   "test",
+		Body:     "hello world",
+		Editable: false,
+		Duration: -1,
 	}
-	assert.EqualError(t, m.Validate(), "missing/invalid value for attribute 'duration'")
+	assert.EqualError(t, m.Validate(), "duration must be in range [5, 525600]")
+	// Bad case: Duration in range [1, 4] is invalid.
+	m = PasteCreateRequest{
+		Header:   "test",
+		Body:     "hello world",
+		Editable: false,
+		Duration: 4,
+	}
+	assert.EqualError(t, m.Validate(), "duration must be in range [5, 525600]")
 	// Bad case: Empty header is invalid.
 	m = PasteCreateRequest{
-		Headers:          "",
-		EncryptedContent: "hello world",
-		Editable:         false,
-		MinutesDuration:  10,
+		Header:   "",
+		Body:     "hello world",
+		Editable: false,
+		Duration: 10,
 	}
-	assert.EqualError(t, m.Validate(), "missing/invalid value for attribute 'headers'")
+	assert.EqualError(t, m.Validate(), "missing paste header")
 	// Bad case: Empty content is invalid.
 	m = PasteCreateRequest{
-		Headers:          "test",
-		EncryptedContent: "",
-		Editable:         false,
-		MinutesDuration:  10,
+		Header:   "test",
+		Body:     "",
+		Editable: false,
+		Duration: 10,
 	}
-	assert.EqualError(t, m.Validate(), "missing/invalid value for attribute 'content'")
+	assert.EqualError(t, m.Validate(), "missing paste body")
 }
 
 func TestPasteIdentifier(t *testing.T) {
 	// Good case.
 	m := PasteIdentifier{
 		Id:      "hello",
-		EditKey: "test",
+		EditKey: "",
 	}
 	assert.Nil(t, m.Validate())
-	// Bad case: Empty ID field should never happen with Mux.
+	// Bad case: Empty ID field should never happen.
 	m = PasteIdentifier{
 		Id:      "",
-		EditKey: "test",
+		EditKey: "can be anything",
 	}
-	assert.EqualError(t, m.Validate(), "missing/invalid value for path variable 'id'")
+	assert.EqualError(t, m.Validate(), "missing paste ID")
 }

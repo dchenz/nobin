@@ -11,3 +11,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/*
+  Set minimum height of the div between navbar and footer.
+  This ensures that the footer always appears at the bottom.
+  The MUI AppBar height changes according to screen width.
+*/
+
+@mixin app-body-height($header-height, $footer-height) {
+  #app-body {
+    min-height: calc(100vh - $header-height - $footer-height);
+  }
+}
+
+@media (min-width: 0px) {
+  @include app-body-height(48px, 144px);
+}
+
+@media (min-width: 600px) {
+  @include app-body-height(64px, 144px);
+}
