@@ -21,6 +21,9 @@ func RespondSuccess(w http.ResponseWriter, data interface{}) {
 func RespondFail(w http.ResponseWriter, status int, errMsg string) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(status)
+	// if status == http.StatusInternalServerError {
+	// 	errMsg = "Something went wrong on the server..."
+	// }
 	json.NewEncoder(w).Encode(model.Response{
 		Success: false,
 		Data:    errMsg,

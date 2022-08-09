@@ -1,4 +1,4 @@
-import { Table, TableCell, TableRow } from "@mui/material";
+import { Table, TableBody, TableCell, TableRow } from "@mui/material";
 import React, { useMemo } from "react";
 import { PasteFull } from "../../shared/types/Paste";
 
@@ -28,30 +28,32 @@ export default function PasteInfoTable({ paste }: PasteInfoTableProps): JSX.Elem
 
   return (
     <Table>
-      <TableRow>
-        <TableCell variant="head">
-          Paste ID
-        </TableCell>
-        <TableCell>
-          {paste.id}
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell variant="head">
-          Timestamp
-        </TableCell>
-        <TableCell>
-          {creationTime}
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell variant="head">
-          Expires
-        </TableCell>
-        <TableCell>
-          {expiryTime}
-        </TableCell>
-      </TableRow>
+      <TableBody>
+        <TableRow>
+          <TableCell variant="head">
+            Paste ID
+          </TableCell>
+          <TableCell>
+            {paste.id}
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell variant="head">
+            Timestamp
+          </TableCell>
+          <TableCell>
+            {creationTime}
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell variant="head">
+            Expires
+          </TableCell>
+          <TableCell>
+            {expiryTime}
+          </TableCell>
+        </TableRow>
+      </TableBody>
     </Table>
   );
 }

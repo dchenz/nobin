@@ -18,7 +18,6 @@ export type PasteFull = {
 export type PasteCreateRequest = {
   content: PasteContent
   duration: number
-  editable: boolean
 }
 
 /**
@@ -54,7 +53,7 @@ export type HMACOptions = {
  */
 export type PasteRef = {
   id: string
-  editKey: string | null
+  editKey: string
 }
 
 

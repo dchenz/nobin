@@ -4,23 +4,30 @@ import (
 	"database/sql"
 	dbmodel "server/src/database/model"
 	"server/src/routes/model"
-	"time"
 )
 
 func (d *PastesDB) GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, error) {
 	p, err := d.getPaste(ref.Id)
+	// Paste doesn't exist.
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
+	// Paste has expired.
+	if p.Expiry.Valid && !(utcNow().Before(p.Expiry.Time)) {
+		return nil, nil
+	}
+	// Convert expiry date back into duration minutes.
 	var pasteDuration int
 	if p.Expiry.Valid {
 		pasteDuration = minutesBetweenDates(p.Expiry.Time, p.CreatedAt)
 	}
-	// Not editable if paste has no edit key or if keys don't match.
-	canEdit := p.EditKey.Valid && p.EditKey.String == ref.EditKey
+	// Not editable if keys don't match.
 	paste := model.PasteResponse{
 		Id:        p.Id,
-		Editable:  canEdit,
+		Editable:  p.EditKey == ref.EditKey,
 		CreatedAt: p.CreatedAt.Unix(),
 		Duration:  pasteDuration,
 		Header:    p.Header,
@@ -30,22 +37,14 @@ func (d *PastesDB) GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, er
 }
 
 func (d *PastesDB) CreatePaste(paste model.PasteCreateRequest) (*model.PasteIdentifier, error) {
-	pasteID := createUUID()
-	editKey := sql.NullString{
-		Valid: false,
-	}
-	if paste.Editable {
-		editKey.String = createUUID()
-		editKey.Valid = true
-	}
-	now := time.Now()
+	now := utcNow()
 	expiry := sql.NullTime{
 		Time:  addMinutesToDate(now, paste.Duration),
 		Valid: paste.Duration > 0,
 	}
 	p := dbmodel.Paste{
-		Id:        pasteID,
-		EditKey:   editKey,
+		Id:        createUUID(),
+		EditKey:   createUUID(),
 		CreatedAt: now,
 		Expiry:    expiry,
 		Header:    paste.Header,
@@ -55,8 +54,8 @@ func (d *PastesDB) CreatePaste(paste model.PasteCreateRequest) (*model.PasteIden
 		return nil, err
 	}
 	m := model.PasteIdentifier{
-		Id:      pasteID,
-		EditKey: editKey.String,
+		Id:      p.Id,
+		EditKey: p.EditKey,
 	}
 	return &m, nil
 }

@@ -22,7 +22,6 @@ type PasteCreateRequest struct {
 	Header   string `json:"header"`
 	Body     string `json:"body"`
 	Duration int    `json:"duration"`
-	Editable bool   `json:"editable"`
 }
 
 func (m *PasteCreateRequest) Parse(r *http.Request) error {
@@ -57,14 +56,11 @@ type PasteIdentifier struct {
 
 func (m *PasteIdentifier) Parse(r *http.Request) error {
 	pathVars := mux.Vars(r)
-	if pasteId, exists := pathVars["id"]; exists && len(pasteId) > 0 {
+	if pasteId, exists := pathVars["id"]; exists {
 		m.Id = pasteId
 	}
-	// Edit key is not used by the read handler.
 	queryParams := r.URL.Query()
-	if editKey, exists := queryParams["edit_key"]; exists && len(editKey) > 0 {
-		m.EditKey = editKey[0]
-	}
+	m.EditKey = queryParams.Get("edit_key")
 	return m.Validate()
 }
 

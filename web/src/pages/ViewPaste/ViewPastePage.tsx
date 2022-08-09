@@ -19,19 +19,22 @@ export default function ViewPastePage({ paste }: ViewPastePageProps): JSX.Elemen
           <PasteInfoTable paste={paste} />
         </Grid>
         <Grid item md={4} p={1} width="100%" textAlign="right">
-          <ButtonGroup orientation="vertical">
-            <Button
-              variant="contained"
-            >
-              Edit
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-            >
-              Delete
-            </Button>
-          </ButtonGroup>
+          {
+            paste.editable ?
+              <ButtonGroup orientation="vertical">
+                <Button
+                  variant="contained"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                >
+                  Delete
+                </Button>
+              </ButtonGroup> : null
+          }
         </Grid>
         <Grid item md={12} p={1} width="100%">
           <TextareaAutosize

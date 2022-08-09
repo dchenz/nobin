@@ -1,7 +1,6 @@
 package pastehandler
 
 import (
-	"database/sql"
 	"net/http"
 	"server/src/routes/model"
 	"server/src/server"
@@ -25,11 +24,11 @@ func handleReadPaste(s *server.Runtime) http.Handler {
 		}
 		response, err := s.PasteRepo.GetPaste(pasteRef)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				RespondFail(w, http.StatusNotFound, "paste not found")
-			} else {
-				RespondFail(w, http.StatusInternalServerError, err.Error())
-			}
+			RespondFail(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		if response == nil {
+			RespondFail(w, http.StatusNotFound, "paste not found")
 			return
 		}
 		RespondSuccess(w, response)

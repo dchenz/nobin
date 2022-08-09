@@ -2,7 +2,6 @@ package database
 
 import (
 	dbmodel "server/src/database/model"
-	"time"
 )
 
 func (d *PastesDB) getPaste(id string) (*dbmodel.Paste, error) {
@@ -14,8 +13,8 @@ func (d *PastesDB) getPaste(id string) (*dbmodel.Paste, error) {
 			header,
 			body
 		  FROM nobin_paste
-		  WHERE id = ? AND (expiry IS NULL OR expiry > ?)`
-	row := d.Connection.QueryRow(q, id, time.Now())
+		  WHERE id = ?`
+	row := d.Connection.QueryRow(q, id)
 	var p dbmodel.Paste
 	err := row.Scan(
 		&p.Id,

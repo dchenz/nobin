@@ -1,6 +1,7 @@
 package database
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -29,4 +30,9 @@ func TestMinutesBetweenDates(t *testing.T) {
 func TestCreateUUID(t *testing.T) {
 	id := createUUID()
 	assert.Equal(t, 32, len(id))
+}
+
+func TestUTCNow(t *testing.T) {
+	now := utcNow()
+	assert.True(t, strings.HasSuffix(now.String(), "+0000 UTC"))
 }

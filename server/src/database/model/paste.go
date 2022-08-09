@@ -7,7 +7,7 @@ import (
 
 type Paste struct {
 	Id        string
-	EditKey   sql.NullString
+	EditKey   string
 	CreatedAt time.Time
 	Expiry    sql.NullTime
 	Header    string

@@ -43,17 +43,16 @@ export default function CreatePastePage(): JSX.Element {
       const encryptedPaste = encrypt(pasteContent, password);
       const paste = {
         content: encryptedPaste,
-        duration: duration,
-        editable: false // TODO: Add toggle for edit setting.
+        duration: duration
       };
       submitPaste(paste)
         .then(({ success, data }: Maybe<PasteRef>) => {
           if (success) {
             // Redirect the user to the newly-created paste.
-            let newURL = `${PageRoutes.viewPasteRoot}/${data.id}`;
-            if (data.editKey) {
-              newURL += `?edit_key=${encodeURIComponent(data.editKey)}`;
-            }
+            const newURL = (
+              `${PageRoutes.viewPasteRoot}/${data.id}` +
+              `?edit_key=${encodeURIComponent(data.editKey)}`
+            );
             navigate(newURL);
           } else {
             console.error(data);

@@ -22,3 +22,7 @@ func minutesBetweenDates(d1, d2 time.Time) int {
 func createUUID() string {
 	return strings.ReplaceAll(uuid.NewString(), "-", "")
 }
+
+func utcNow() time.Time {
+	return time.Now().UTC()
+}

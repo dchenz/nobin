@@ -3,11 +3,15 @@ import { PasteFull } from "../shared/types/Paste";
 /**
  * GetPaste sends a GET request to the API for reading a specific paste.
  *
- * @param id Paste ID.
- * @returns  Paste object, if it exists, else returns NULL.
+ * @param id      Paste ID.
+ * @param editKey Secret key that allows paste editing.
+ * @returns       Paste object, if it exists, else returns NULL.
  */
-export async function getPaste(id: string): Promise<PasteFull | null> {
-  const url = "/api/paste/" + encodeURIComponent(id);
+export async function getPaste(id: string, editKey?: string): Promise<PasteFull | null> {
+  let url = "/api/paste/" + encodeURIComponent(id);
+  if (editKey) {
+    url += `?edit_key=${encodeURIComponent(editKey)}`;
+  }
   const response = await fetch(url);
   const { success, data } = await response.json();
   if (!success && response.status == 404) {
