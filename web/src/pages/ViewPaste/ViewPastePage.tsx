@@ -1,6 +1,7 @@
-import { Button, ButtonGroup, Container, Grid, TextareaAutosize } from "@mui/material";
+import { Container, Grid, TextareaAutosize } from "@mui/material";
 import React, { useState } from "react";
 import { PasteFull } from "../../shared/types/Paste";
+import EditButtons from "./EditButtons";
 import PasteInfoTable from "./PasteInfoTable";
 
 type ViewPastePageProps = {
@@ -12,6 +13,12 @@ type ViewPastePageProps = {
  */
 export default function ViewPastePage({ paste }: ViewPastePageProps): JSX.Element {
   const [pasteContent, setPasteContent] = useState(paste.content.body);
+  const [isEditing, setEditing] = useState(false);
+
+  const onPasteDelete = () => {
+    return;
+  };
+
   return (
     <Container>
       <Grid container py={3}>
@@ -21,19 +28,11 @@ export default function ViewPastePage({ paste }: ViewPastePageProps): JSX.Elemen
         <Grid item md={4} p={1} width="100%" textAlign="right">
           {
             paste.editable ?
-              <ButtonGroup orientation="vertical">
-                <Button
-                  variant="contained"
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                >
-                  Delete
-                </Button>
-              </ButtonGroup> : null
+              <EditButtons
+                isEditing={isEditing}
+                setEditing={setEditing}
+                deletePaste={onPasteDelete}
+              /> : null
           }
         </Grid>
         <Grid item md={12} p={1} width="100%">
@@ -43,11 +42,11 @@ export default function ViewPastePage({ paste }: ViewPastePageProps): JSX.Elemen
             minRows={12}
             value={pasteContent}
             onChange={(e) => {
-              if (paste.editable) {
+              if (isEditing) {
                 setPasteContent(e.target.value);
               }
             }}
-            readOnly={!paste.editable}
+            readOnly={!isEditing}
           />
         </Grid>
       </Grid>

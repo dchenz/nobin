@@ -1,0 +1,10 @@
+.control-btn-ctn {
+    display: inline-flex;
+    flex-direction: column;
+
+    .control-btn {
+        min-width: 100px;
+        margin-bottom: 8px;
+        justify-content: flex-start;
+    }
+}
