@@ -2,23 +2,18 @@ package sqlite
 
 import (
 	"database/sql"
-	"errors"
 	dbmodel "server/src/database/sqlite/model"
 	"server/src/routes/model"
 )
 
 func (d *PastesDB) GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, error) {
 	p, err := d.getPaste(ref.ID)
-	// Paste doesn't exist.
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
 	if err != nil {
 		return nil, err
 	}
 	// Paste has expired.
 	if p.Expiry.Valid && !(utcNow().Before(p.Expiry.Time)) {
-		return nil, nil
+		return nil, sql.ErrNoRows
 	}
 	// Convert expiry date back into duration minutes.
 	var pasteDuration int
@@ -59,4 +54,20 @@ func (d *PastesDB) CreatePaste(paste model.PasteCreateRequest) (*model.PasteIden
 		EditKey: p.EditKey,
 	}
 	return &m, nil
+}
+
+func (d *PastesDB) UpdatePaste(ref model.PasteIdentifier, p model.PasteUpdateRequest) (bool, error) {
+	authorized, err := d.hasValidEditKey(ref.ID, ref.EditKey)
+	if err != nil || !authorized {
+		return authorized, err
+	}
+	return true, d.updatePaste(ref.ID, p.Header, p.Body)
+}
+
+func (d *PastesDB) DeletePaste(ref model.PasteIdentifier) (bool, error) {
+	authorized, err := d.hasValidEditKey(ref.ID, ref.EditKey)
+	if err != nil || !authorized {
+		return authorized, err
+	}
+	return true, d.deletePaste(ref.ID)
 }

@@ -47,6 +47,30 @@ func TestPasteCreateRequest(t *testing.T) {
 	assert.EqualError(t, m.Validate(), "missing paste header")
 }
 
+func TestPasteUpdateRequest(t *testing.T) {
+	// Good case.
+	m := PasteUpdateRequest{
+		Header: "test",
+		Body:   "hello world",
+	}
+	assert.Nil(t, m.Validate())
+	// Bad case: Empty header is invalid.
+	m = PasteUpdateRequest{
+		Header: "",
+		Body:   "hello world",
+	}
+	assert.EqualError(t, m.Validate(), "missing paste header")
+	// Bad case: Empty content is invalid.
+	m = PasteUpdateRequest{
+		Header: "test",
+		Body:   "",
+	}
+	assert.EqualError(t, m.Validate(), "missing paste body")
+	// Bad case: Missing values.
+	m = PasteUpdateRequest{}
+	assert.EqualError(t, m.Validate(), "missing paste header")
+}
+
 func TestPasteIdentifier(t *testing.T) {
 	// Good case.
 	m := PasteIdentifier{

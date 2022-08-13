@@ -146,9 +146,8 @@ func TestExpiredPastes(t *testing.T) {
 			assert.FailNow(t, "unexpected error: "+err.Error())
 		}
 		p, err := d.GetPaste(ref)
-		assert.Nil(t, err)
 		if tc.expectExpired {
-			assert.Nil(t, p)
+			assert.ErrorIs(t, err, sql.ErrNoRows)
 		} else {
 			assert.Equal(t, p.ID, ref.ID)
 		}

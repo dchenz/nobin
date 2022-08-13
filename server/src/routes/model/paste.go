@@ -49,6 +49,33 @@ func (m *PasteCreateRequest) Validate() error {
 	return nil
 }
 
+type PasteUpdateRequest struct {
+	Header string `json:"header"`
+	Body   string `json:"body"`
+}
+
+func (m *PasteUpdateRequest) Parse(r *http.Request) error {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return fmt.Errorf("expected body")
+	}
+	err = json.Unmarshal(body, m)
+	if err != nil {
+		return err
+	}
+	return m.Validate()
+}
+
+func (m *PasteUpdateRequest) Validate() error {
+	if m.Header == "" {
+		return fmt.Errorf("missing paste header")
+	}
+	if m.Body == "" {
+		return fmt.Errorf("missing paste body")
+	}
+	return nil
+}
+
 type PasteIdentifier struct {
 	ID      string `json:"id"`
 	EditKey string `json:"edit_key"`

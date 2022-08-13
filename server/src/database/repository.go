@@ -7,5 +7,6 @@ import (
 type PasteRepository interface {
 	CreatePaste(p model.PasteCreateRequest) (*model.PasteIdentifier, error)
 	GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, error)
-	// DeletePaste()
+	UpdatePaste(ref model.PasteIdentifier, p model.PasteUpdateRequest) (bool, error)
+	DeletePaste(ref model.PasteIdentifier) (bool, error)
 }
