@@ -50,13 +50,13 @@ func TestPasteCreateRequest(t *testing.T) {
 func TestPasteIdentifier(t *testing.T) {
 	// Good case.
 	m := PasteIdentifier{
-		Id:      "hello",
+		ID:      "hello",
 		EditKey: "",
 	}
 	assert.Nil(t, m.Validate())
 	// Bad case: Empty ID field should never happen.
 	m = PasteIdentifier{
-		Id:      "",
+		ID:      "",
 		EditKey: "can be anything",
 	}
 	assert.EqualError(t, m.Validate(), "missing paste ID")

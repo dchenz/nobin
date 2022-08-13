@@ -7,6 +7,7 @@ import (
 	"server/src/logging"
 	"server/src/middleware"
 	"server/src/routes/pastehandler"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -18,8 +19,9 @@ type Server struct {
 
 func (s *Server) StartServer(port int) {
 	httpServer := http.Server{
-		Handler: s.RootRouter,
-		Addr:    fmt.Sprintf("127.0.0.1:%d", port),
+		Handler:           s.RootRouter,
+		Addr:              fmt.Sprintf("127.0.0.1:%d", port),
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 	logging.Log("server is listening at " + httpServer.Addr)
 	if err := httpServer.ListenAndServe(); err != nil {

@@ -8,7 +8,7 @@ import (
 )
 
 func addMinutesToDate(d time.Time, n int) time.Time {
-	return d.Add(time.Duration(time.Minute * time.Duration(n)))
+	return d.Add(time.Minute * time.Duration(n))
 }
 
 func minutesBetweenDates(d1, d2 time.Time) int {

@@ -48,25 +48,25 @@ func TestCreateGetPaste(t *testing.T) {
 			assert.FailNow(t, "unexpected error: "+err.Error())
 		}
 		// All pastes are editable and should return an ID and edit key.
-		assert.Equal(t, len(ref.Id), 32)
+		assert.Equal(t, len(ref.ID), 32)
 		assert.Equal(t, len(ref.EditKey), 32)
 		// Test the business-logic functions.
 		paste, err := d.GetPaste(*ref)
 		if err != nil {
 			assert.FailNow(t, "unexpected error: "+err.Error())
 		}
-		assert.Equal(t, ref.Id, paste.Id)
+		assert.Equal(t, ref.ID, paste.ID)
 		assert.True(t, paste.Editable)
 		assert.GreaterOrEqual(t, utcNow().Unix(), paste.CreatedAt)
 		assert.Equal(t, tc.request.Duration, paste.Duration)
 		assert.Equal(t, tc.request.Header, paste.Header)
 		assert.Equal(t, tc.request.Body, paste.Body)
 		// Test the database functions.
-		row, err := d.getPaste(ref.Id)
+		row, err := d.getPaste(ref.ID)
 		if err != nil {
 			assert.FailNow(t, "unexpected error: "+err.Error())
 		}
-		assert.Equal(t, ref.Id, row.Id)
+		assert.Equal(t, ref.ID, row.ID)
 		assert.Equal(t, ref.EditKey, row.EditKey)
 		assert.GreaterOrEqual(t, utcNow(), row.CreatedAt)
 		if tc.request.Duration == 0 {
@@ -128,11 +128,11 @@ func TestExpiredPastes(t *testing.T) {
 	for _, tc := range cases {
 		pastCreateTime := addMinutesToDate(utcNow(), -tc.minutesElapsed)
 		ref := model.PasteIdentifier{
-			Id:      createUUID(),
+			ID:      createUUID(),
 			EditKey: createUUID(),
 		}
 		err := d.createPaste(dbmodel.Paste{
-			Id:        ref.Id,
+			ID:        ref.ID,
 			EditKey:   ref.EditKey,
 			CreatedAt: pastCreateTime,
 			Expiry: sql.NullTime{
@@ -150,7 +150,7 @@ func TestExpiredPastes(t *testing.T) {
 		if tc.expectExpired {
 			assert.Nil(t, p)
 		} else {
-			assert.Equal(t, p.Id, ref.Id)
+			assert.Equal(t, p.ID, ref.ID)
 		}
 	}
 }

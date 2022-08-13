@@ -5,7 +5,7 @@ import (
 	"os"
 	"server/src/logging"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // Must import as blank
 )
 
 type PastesDB struct {

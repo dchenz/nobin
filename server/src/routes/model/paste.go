@@ -10,7 +10,7 @@ import (
 )
 
 type PasteResponse struct {
-	Id        string `json:"id"`
+	ID        string `json:"id"`
 	Editable  bool   `json:"editable"`
 	CreatedAt int64  `json:"created_at"`
 	Duration  int    `json:"duration"`
@@ -50,14 +50,14 @@ func (m *PasteCreateRequest) Validate() error {
 }
 
 type PasteIdentifier struct {
-	Id      string `json:"id"`
+	ID      string `json:"id"`
 	EditKey string `json:"edit_key"`
 }
 
 func (m *PasteIdentifier) Parse(r *http.Request) error {
 	pathVars := mux.Vars(r)
-	if pasteId, exists := pathVars["id"]; exists {
-		m.Id = pasteId
+	if pasteID, exists := pathVars["id"]; exists {
+		m.ID = pasteID
 	}
 	queryParams := r.URL.Query()
 	m.EditKey = queryParams.Get("edit_key")
@@ -65,7 +65,7 @@ func (m *PasteIdentifier) Parse(r *http.Request) error {
 }
 
 func (m *PasteIdentifier) Validate() error {
-	if m.Id == "" {
+	if m.ID == "" {
 		return fmt.Errorf("missing paste ID")
 	}
 	return nil

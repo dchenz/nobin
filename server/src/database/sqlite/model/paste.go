@@ -6,7 +6,7 @@ import (
 )
 
 type Paste struct {
-	Id        string
+	ID        string
 	EditKey   string
 	CreatedAt time.Time
 	Expiry    sql.NullTime

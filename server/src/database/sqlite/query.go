@@ -2,14 +2,15 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	dbmodel "server/src/database/sqlite/model"
 	"server/src/routes/model"
 )
 
 func (d *PastesDB) GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, error) {
-	p, err := d.getPaste(ref.Id)
+	p, err := d.getPaste(ref.ID)
 	// Paste doesn't exist.
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
@@ -26,7 +27,7 @@ func (d *PastesDB) GetPaste(ref model.PasteIdentifier) (*model.PasteResponse, er
 	}
 	// Not editable if keys don't match.
 	paste := model.PasteResponse{
-		Id:        p.Id,
+		ID:        p.ID,
 		Editable:  p.EditKey == ref.EditKey,
 		CreatedAt: p.CreatedAt.Unix(),
 		Duration:  pasteDuration,
@@ -43,7 +44,7 @@ func (d *PastesDB) CreatePaste(paste model.PasteCreateRequest) (*model.PasteIden
 		Valid: paste.Duration > 0,
 	}
 	p := dbmodel.Paste{
-		Id:        createUUID(),
+		ID:        createUUID(),
 		EditKey:   createUUID(),
 		CreatedAt: now,
 		Expiry:    expiry,
@@ -54,7 +55,7 @@ func (d *PastesDB) CreatePaste(paste model.PasteCreateRequest) (*model.PasteIden
 		return nil, err
 	}
 	m := model.PasteIdentifier{
-		Id:      p.Id,
+		ID:      p.ID,
 		EditKey: p.EditKey,
 	}
 	return &m, nil

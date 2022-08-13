@@ -2,8 +2,6 @@ package database
 
 import (
 	"server/src/routes/model"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type PasteRepository interface {

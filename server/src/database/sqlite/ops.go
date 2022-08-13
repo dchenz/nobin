@@ -17,7 +17,7 @@ func (d *PastesDB) getPaste(id string) (*dbmodel.Paste, error) {
 	row := d.Conn.QueryRow(q, id)
 	var p dbmodel.Paste
 	err := row.Scan(
-		&p.Id,
+		&p.ID,
 		&p.EditKey,
 		&p.CreatedAt,
 		&p.Expiry,
@@ -42,7 +42,7 @@ func (d *PastesDB) createPaste(p dbmodel.Paste) error {
 		  VALUES (?, ?, ?, ?, ?, ?)`
 	_, err := d.Conn.Exec(
 		q,
-		p.Id,
+		p.ID,
 		p.EditKey,
 		p.CreatedAt,
 		p.Expiry,
