@@ -3,18 +3,9 @@ package pastehandler
 import (
 	"net/http"
 	"server/src/routes/model"
-	"server/src/server"
 )
 
-func Register(s *server.Runtime) {
-	r := s.Router.PathPrefix("/api/paste").Subrouter()
-	r.Handle("/{id}", handleReadPaste(s)).Methods("GET")
-	r.Handle("", handleCreatePaste(s)).Methods("POST")
-	r.Handle("/{id}", handleUpdatePaste(s)).Methods("POST")
-	r.Handle("/{id}", handleDeletePaste(s)).Methods("DELETE")
-}
-
-func handleReadPaste(s *server.Runtime) http.Handler {
+func handleReadPaste(px *PasteRouter) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var pasteRef model.PasteIdentifier
 		err := pasteRef.Parse(r)
@@ -22,7 +13,7 @@ func handleReadPaste(s *server.Runtime) http.Handler {
 			RespondFail(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		response, err := s.PasteRepo.GetPaste(pasteRef)
+		response, err := px.DataSource.GetPaste(pasteRef)
 		if err != nil {
 			RespondFail(w, http.StatusInternalServerError, err.Error())
 			return
@@ -35,7 +26,7 @@ func handleReadPaste(s *server.Runtime) http.Handler {
 	})
 }
 
-func handleCreatePaste(s *server.Runtime) http.Handler {
+func handleCreatePaste(px *PasteRouter) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var pasteRequest model.PasteCreateRequest
 		err := pasteRequest.Parse(r)
@@ -43,7 +34,7 @@ func handleCreatePaste(s *server.Runtime) http.Handler {
 			RespondFail(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		response, err := s.PasteRepo.CreatePaste(pasteRequest)
+		response, err := px.DataSource.CreatePaste(pasteRequest)
 		if err != nil {
 			RespondFail(w, http.StatusInternalServerError, err.Error())
 			return
@@ -52,13 +43,13 @@ func handleCreatePaste(s *server.Runtime) http.Handler {
 	})
 }
 
-func handleUpdatePaste(s *server.Runtime) http.Handler {
+func handleUpdatePaste(px *PasteRouter) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 	})
 }
 
-func handleDeletePaste(s *server.Runtime) http.Handler {
+func handleDeletePaste(px *PasteRouter) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 	})

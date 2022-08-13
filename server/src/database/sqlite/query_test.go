@@ -1,25 +1,16 @@
-package database
+package sqlite
 
 import (
 	"database/sql"
-	"os"
-	dbmodel "server/src/database/model"
+	dbmodel "server/src/database/sqlite/model"
 	"server/src/routes/model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func connectToTestDB() *PastesDB {
-	path := os.Getenv("GO_SQLITE_TEST_PATH")
-	if path == "" {
-		panic("test database could not be read from environment (GO_SQLITE_TEST_PATH)")
-	}
-	return NewPastesDBConnection(path)
-}
-
 func TestCreateGetPaste(t *testing.T) {
-	d := connectToTestDB()
+	d := testPasteDBConnection()
 
 	cases := []struct {
 		request       model.PasteCreateRequest
@@ -90,7 +81,7 @@ func TestCreateGetPaste(t *testing.T) {
 }
 
 func TestExpiredPastes(t *testing.T) {
-	d := connectToTestDB()
+	d := testPasteDBConnection()
 
 	cases := []struct {
 		duration       int

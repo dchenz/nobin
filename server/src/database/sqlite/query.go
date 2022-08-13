@@ -1,8 +1,8 @@
-package database
+package sqlite
 
 import (
 	"database/sql"
-	dbmodel "server/src/database/model"
+	dbmodel "server/src/database/sqlite/model"
 	"server/src/routes/model"
 )
 

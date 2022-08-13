@@ -1,7 +1,7 @@
-package database
+package sqlite
 
 import (
-	dbmodel "server/src/database/model"
+	dbmodel "server/src/database/sqlite/model"
 )
 
 func (d *PastesDB) getPaste(id string) (*dbmodel.Paste, error) {
@@ -14,7 +14,7 @@ func (d *PastesDB) getPaste(id string) (*dbmodel.Paste, error) {
 			body
 		  FROM nobin_paste
 		  WHERE id = ?`
-	row := d.Connection.QueryRow(q, id)
+	row := d.Conn.QueryRow(q, id)
 	var p dbmodel.Paste
 	err := row.Scan(
 		&p.Id,
@@ -40,7 +40,7 @@ func (d *PastesDB) createPaste(p dbmodel.Paste) error {
 			body
 		  )
 		  VALUES (?, ?, ?, ?, ?, ?)`
-	_, err := d.Connection.Exec(
+	_, err := d.Conn.Exec(
 		q,
 		p.Id,
 		p.EditKey,
