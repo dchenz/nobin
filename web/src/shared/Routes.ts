@@ -3,3 +3,5 @@ export const PageRoutes = {
   viewPaste: "/p/:id",
   viewPasteRoot: "/p"
 };
+
+export const BackendURL = "https://nobin.api.dchen.pro";

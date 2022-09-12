@@ -1,5 +1,6 @@
 import { PasteCreateRequest, PasteRef } from "../shared/types/Paste";
 import { Maybe } from "../shared/types/Responses";
+import { BackendURL } from "../shared/Routes";
 
 /**
  * SubmitPaste sends a POST request to the API for creating a new paste.
@@ -16,7 +17,7 @@ export async function submitPaste(paste: PasteCreateRequest): Promise<Maybe<Past
     body: paste.content.body,
     duration: paste.duration
   };
-  const response = await fetch("/api/paste", {
+  const response = await fetch(`${BackendURL}/api/paste`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

@@ -1,4 +1,5 @@
 import { PasteFull } from "../shared/types/Paste";
+import { BackendURL } from "../shared/Routes";
 
 /**
  * GetPaste sends a GET request to the API for reading a specific paste.
@@ -8,7 +9,7 @@ import { PasteFull } from "../shared/types/Paste";
  * @returns       Paste object, if it exists, else returns NULL.
  */
 export async function getPaste(id: string, editKey?: string): Promise<PasteFull | null> {
-  let url = "/api/paste/" + encodeURIComponent(id);
+  let url = `${BackendURL}/api/paste/${encodeURIComponent(id)}`;
   if (editKey) {
     url += `?edit_key=${encodeURIComponent(editKey)}`;
   }
