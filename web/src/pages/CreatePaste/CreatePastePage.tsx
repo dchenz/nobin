@@ -49,7 +49,7 @@ export default function CreatePastePage(): JSX.Element {
       const encryptedPaste = encrypt(pasteContent, password);
       const paste = {
         content: encryptedPaste,
-        duration: duration
+        duration: duration ? duration : null // Zero becomes null
       };
       submitPaste(paste, captchaToken ?? "")
         .then(({ success, data }: Maybe<PasteRef>) => {

@@ -12,7 +12,7 @@ type PasteInfoTableProps = {
 export default function PasteInfoTable({ paste }: PasteInfoTableProps): JSX.Element {
 
   const [creationTime, expiryTime] = useMemo(() => {
-    if (paste.duration == 0) {
+    if (!paste.duration) {
       return [
         paste.createdAt.toUTCString(),
         "Never"

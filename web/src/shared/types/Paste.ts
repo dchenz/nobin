@@ -5,7 +5,7 @@
 export type PasteFull = {
   id: string
   createdAt: Date
-  duration: number
+  duration: number | null
   editable: boolean
   content: PasteContent
 }
@@ -17,7 +17,7 @@ export type PasteFull = {
  */
 export type PasteCreateRequest = {
   content: PasteContent
-  duration: number
+  duration: number | null
 }
 
 /**
