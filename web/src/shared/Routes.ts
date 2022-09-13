@@ -1,5 +1,6 @@
 export const PageRoutes = {
   home: "/",
+  recentPastes: "/recent",
   viewPaste: "/p/:id",
   viewPasteRoot: "/p"
 };

@@ -46,24 +46,23 @@ export default function CreatePastePage(): JSX.Element {
 
   const onPasteSubmit = () => {
     if (canSubmit) {
+      const onSuccess = ({ success, data }: Maybe<PasteRef>) => {
+        if (success) {
+          // Temporarily save the token that allows editing.
+          sessionStorage.setItem(`edit-${data.id}`, data.editKey);
+          // Redirect the user to the newly-created paste.
+          navigate(`${PageRoutes.viewPasteRoot}/${data.id}`);
+        } else {
+          console.error(data);
+        }
+      };
       const encryptedPaste = encrypt(pasteContent, password);
       const paste = {
         content: encryptedPaste,
         duration: duration ? duration : null // Zero becomes null
       };
       submitPaste(paste, captchaToken ?? "")
-        .then(({ success, data }: Maybe<PasteRef>) => {
-          if (success) {
-            // Redirect the user to the newly-created paste.
-            const newURL = (
-              `${PageRoutes.viewPasteRoot}/${data.id}` +
-              `?edit_key=${encodeURIComponent(data.editKey)}`
-            );
-            navigate(newURL);
-          } else {
-            console.error(data);
-          }
-        })
+        .then(onSuccess)
         .catch(console.error);
     }
   };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getPaste } from "../../api/GetPaste";
 import { PasteFull } from "../../shared/types/Paste";
 import PasteNotFound from "./PasteNotFound";
@@ -15,14 +15,14 @@ export default function ViewPaste(): JSX.Element {
   const [isLoading, setLoading] = useState(true);
   const [isUnlocked, setUnlocked] = useState(false);
   const { id } = useParams();
-  const [queryParams] = useSearchParams();
 
   useEffect(() => {
     if (!id) {
       console.error("ID should not be undefined in ViewPaste.");
       return;
     }
-    getPaste(id, queryParams.get("edit_key") ?? undefined)
+    const editKey = sessionStorage.getItem(`edit-${id}`);
+    getPaste(id, editKey ?? undefined)
       .then((res: PasteFull | null) => {
         setPaste(res);
       })
