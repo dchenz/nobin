@@ -1,4 +1,4 @@
-import { Button, Container, Grid, TextareaAutosize } from "@mui/material";
+import { Container, Grid, TextareaAutosize } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { submitPaste } from "../../api/SubmitPaste";
@@ -7,6 +7,7 @@ import { encrypt } from "../../functions/Crypto";
 import { PageRoutes } from "../../shared/Routes";
 import { PasteRef } from "../../shared/types/Paste";
 import { Maybe } from "../../shared/types/Responses";
+import CaptchaButtonGroup from "./CaptchaButtonGroup";
 import ExpiryPicker from "./ExpiryPicker";
 import NewPassword from "./NewPassword";
 
@@ -18,9 +19,14 @@ export default function CreatePastePage(): JSX.Element {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [duration, setDuration] = useState(0); // Minutes
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const canSubmit = useMemo(() => {
+    // Google Captcha must be solved.
+    if (!captchaToken) {
+      return false;
+    }
     // Fail submission if password is left blank.
     // Fail submission if passwords don't match.
     if (password == "" || password != confirmPassword) {
@@ -36,7 +42,7 @@ export default function CreatePastePage(): JSX.Element {
       return false;
     }
     return true;
-  }, [password, confirmPassword, duration, pasteContent]);
+  }, [captchaToken, password, confirmPassword, duration, pasteContent]);
 
   const onPasteSubmit = () => {
     if (canSubmit) {
@@ -45,7 +51,7 @@ export default function CreatePastePage(): JSX.Element {
         content: encryptedPaste,
         duration: duration
       };
-      submitPaste(paste)
+      submitPaste(paste, captchaToken ?? "")
         .then(({ success, data }: Maybe<PasteRef>) => {
           if (success) {
             // Redirect the user to the newly-created paste.
@@ -96,13 +102,11 @@ export default function CreatePastePage(): JSX.Element {
           </Error>
         </Grid>
         <Grid item md={12} p={1} width="100%">
-          <Button
-            variant="contained"
+          <CaptchaButtonGroup
             onClick={onPasteSubmit}
             disabled={!canSubmit}
-          >
-            Submit
-          </Button>
+            setToken={setCaptchaToken}
+          />
         </Grid>
       </Grid>
     </Container>

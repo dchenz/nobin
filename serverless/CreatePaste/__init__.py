@@ -3,11 +3,20 @@ from http import HTTPStatus
 
 import azure.functions as func
 from jsonschema import ValidationError
-from Shared.HttpUtils import get_request_body, respond_fail, respond_success
+from Shared.HttpUtils import (
+    get_request_body,
+    require_captcha,
+    respond_fail,
+    respond_success,
+)
 from Shared.PasteStorage import create_paste
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+
+    err_response = require_captcha(req)
+    if err_response:
+        return err_response
 
     schema = {
         "type": "object",

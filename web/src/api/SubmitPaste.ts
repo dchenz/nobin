@@ -1,17 +1,22 @@
+import { BackendURL } from "../shared/Routes";
 import { PasteCreateRequest, PasteRef } from "../shared/types/Paste";
 import { Maybe } from "../shared/types/Responses";
-import { BackendURL } from "../shared/Routes";
 
 /**
  * SubmitPaste sends a POST request to the API for creating a new paste.
  *
- * @param paste Encrypted paste object.
+ * @param paste         Encrypted paste object.
+ * @param captchaToken  Response token from Google Captcha V2.
  *
  * @returns     API response. On success, the "data" field contains the
  *              new paste's ID and edit key.
  *              On failure, the "data" field contains an error message.
  */
-export async function submitPaste(paste: PasteCreateRequest): Promise<Maybe<PasteRef>> {
+export async function submitPaste(
+  paste: PasteCreateRequest,
+  captchaToken: string
+): Promise<Maybe<PasteRef>> {
+
   const body = {
     header: JSON.stringify(paste.content.header),
     body: paste.content.body,
@@ -20,7 +25,8 @@ export async function submitPaste(paste: PasteCreateRequest): Promise<Maybe<Past
   const response = await fetch(`${BackendURL}/api/paste`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-GOOGLE-CAPTCHA": captchaToken
     },
     body: JSON.stringify(body)
   });

@@ -1,9 +1,19 @@
 import json
+import logging
 from http import HTTPStatus
-from typing import Any
+from typing import Any, Optional
 
 import azure.functions as func
 from jsonschema import ValidationError, validate
+
+from Shared.Captcha import verify_captcha_token
+
+
+def require_captcha(req: func.HttpRequest) -> Optional[func.HttpResponse]:
+    captcha_token = req.headers.get("X-GOOGLE-CAPTCHA")
+    if not captcha_token or not verify_captcha_token(captcha_token):
+        logging.info("Request rejected due to bad captcha token")
+        return respond_fail(HTTPStatus.UNAUTHORIZED, "Bad X-GOOGLE-CAPTCHA")
 
 
 def respond_success(data: Any) -> func.HttpResponse:

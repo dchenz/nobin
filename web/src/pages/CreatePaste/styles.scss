@@ -1,0 +1,22 @@
+.large-screen {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+
+    &>div {
+        flex-grow: 1;
+    }
+}
+
+.small-screen {
+    width: 100%;
+    text-align: center;
+
+    &>div {
+        margin-bottom: 1em;
+
+        &>div {
+            display: inline-block;
+        }
+    }
+}
