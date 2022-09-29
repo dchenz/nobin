@@ -34,17 +34,29 @@ export type PasteContent = {
  * PasteHeader contains values required for future decryption,
  * such as the algorithms used and randomly-generated IV + salt.
  */
-export type PasteHeader = HMACOptions & {
+export type PasteHeader = (KDFSpecSHA | KDFSpecScrypt) & {
   iv: string
   salt: string
 }
 
+export type KDFSpec = KDFSpecSHA | KDFSpecScrypt
+
 /**
- * HMACOptions contains hashing configuration for CryptoJS.PBKDF2.
+ * KDFSpecSHA contains hashing configuration for CryptoJS.PBKDF2.
  */
-export type HMACOptions = {
-  hash: string
+export type KDFSpecSHA = {
+  hash: "sha256" | "sha512"
   iters: number
+}
+
+/**
+ * KDFSpecScrypt contains hashing configuration for scrypt-js.
+ */
+export type KDFSpecScrypt = {
+  hash: "scrypt"
+  n: number
+  r: number
+  t: number
 }
 
 /**

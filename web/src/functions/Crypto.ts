@@ -1,27 +1,31 @@
+import { Buffer } from "buffer";
 import CryptoJS from "crypto-js";
-import { HMACOptions, PasteContent } from "../shared/types/Paste";
+import ScryptJS from "scrypt-js";
+import { KDFSpec, KDFSpecScrypt, PasteContent, PasteHeader } from "../shared/types/Paste";
 
 type Bytes = CryptoJS.lib.WordArray
 
-const defaultOptions: HMACOptions = {
-  hash: "sha256",
-  iters: 100000
+const defaultOptions: KDFSpecScrypt = {
+  hash: "scrypt",
+  n: 2 ** 14,
+  r: 8,
+  t: 1
 };
 
 const AES_BLOCK_SIZE = 16;
 const SALT_SIZE = 16;
+const AES_KEY_SIZE = 32; // AES-256
 
 /**
  * Encrypt text using the AES-256 cipher and a password.
  *
  * @param text     Plain-text to be encrypted.
  * @param password Password.
- * @param ops      PBKDF2 options (hash algorithm, iteration count).
+ * @param ops      Hash options (hash algorithm, iteration count).
  *
  * @returns        Paste object with header and encrypted body (Base64).
  */
-export function encrypt(text: string, password: string, ops?: HMACOptions): PasteContent {
-  // Use default PBKDF2 options if not provided.
+export function encrypt(text: string, password: string, ops?: KDFSpec): PasteContent {
   if (!ops) {
     ops = defaultOptions;
   }
@@ -30,7 +34,7 @@ export function encrypt(text: string, password: string, ops?: HMACOptions): Past
   // Generate a random 16-byte salt.
   const salt = CryptoJS.lib.WordArray.random(SALT_SIZE);
   // Derive the key for AES-256 by hashing password and salt.
-  const key = deriveKey(ops.hash, password, salt, ops.iters);
+  const key = deriveKey(password, salt.toString(CryptoJS.enc.Base64), ops);
   // Convert the plaintext to JSON so it's possible to verify
   // a successful decryption by JSON-decoding the returned plaintext.
   const plainText = JSON.stringify({ data: text });
@@ -62,10 +66,14 @@ export function encrypt(text: string, password: string, ops?: HMACOptions): Past
  */
 export function decrypt(paste: PasteContent, password: string): string | null {
   const { header, body } = paste;
+  const ops = getKDFSpecFromHeader(header);
+  if (!ops) {
+    // Invalid header.
+    return null;
+  }
   // Derive the key for AES-256 by hashing password and salt.
   const iv = CryptoJS.enc.Base64.parse(header.iv);
-  const salt = CryptoJS.enc.Base64.parse(header.salt);
-  const key = deriveKey(header.hash, password, salt, header.iters);
+  const key = deriveKey(password, header.salt, ops);
   // Decrypt the AES-encrypted cipher-text into UTF-8.
   const cipherText = CryptoJS.lib.CipherParams.create({
     ciphertext: CryptoJS.enc.Base64.parse(body)
@@ -84,30 +92,55 @@ export function decrypt(paste: PasteContent, password: string): string | null {
 }
 
 /**
- * Wrapper over CryptoJS PBKDF2.
+ * Helper for password hashing.
  *
- * @param algo     Hash algorithm to use. Supports SHA256, SHA512.
  * @param password Password or passphrase.
- * @param salt     Password salt.
- * @param iters    Number of hash iterations.
+ * @param salt     Password salt as base64.
+ * @param ops      Hash and options for password hashing.
  *
  * @returns        AES-256 symmetric key derived using parameters.
  */
-function deriveKey(algo: string, pw: string, salt: Bytes, iters: number): Bytes {
-  let algoStatic;
-  switch (algo) {
-    case "sha256":
-      algoStatic = CryptoJS.algo.SHA256;
-      break;
-    case "sha512":
-      algoStatic = CryptoJS.algo.SHA512;
-      break;
-    default:
-      throw new Error(`${algo} is not a supported hash algorithm right now`);
+function deriveKey(pw: string, salt: string, ops: KDFSpec): Bytes {
+  if (ops.hash == "scrypt") {
+    const h = Buffer.from(ScryptJS.syncScrypt(
+      Buffer.from(pw),
+      Buffer.from(salt, "base64"),
+      ops.n,
+      ops.r,
+      ops.t,
+      AES_KEY_SIZE
+    ));
+    return CryptoJS.enc.Base64.parse(h.toString("base64"));
   }
-  return CryptoJS.PBKDF2(pw, salt, {
-    hasher: algoStatic,
-    iterations: iters,
-    keySize: 256 / 32
+  // Not used for encryption, only supported for backwards-compatibility.
+  return CryptoJS.PBKDF2(pw, CryptoJS.enc.Base64.parse(salt), {
+    hasher: ops.hash == "sha256" ? CryptoJS.algo.SHA256 : CryptoJS.algo.SHA512,
+    iterations: ops.iters,
+    keySize: AES_KEY_SIZE * 8 / 32
   });
+}
+
+/**
+ * Helper to retrieve password hashing options from header.
+ *
+ * @param header Paste header.
+ *
+ * @returns      If valid, returns the spec object, otherwise null.
+ */
+function getKDFSpecFromHeader(header: PasteHeader): KDFSpec | null {
+  if (header.hash == "scrypt") {
+    return {
+      hash: header.hash,
+      n: header.n,
+      r: header.r,
+      t: header.t
+    };
+  }
+  if (header.hash == "sha256" || header.hash == "sha512") {
+    return {
+      hash: header.hash,
+      iters: header.iters
+    };
+  }
+  return null;
 }
